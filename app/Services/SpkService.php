@@ -408,9 +408,13 @@ class SpkService
     /**
      * Normalisasi SAW:
      * - BENEFIT: rij = xij / max(xj)
-     * - COST:    rij = min(xj) / xij   (jika xij = 0, rij = 0)
+     * - COST:    rij = min(xj) / xij   (semakin kecil semakin baik)
      *
-     * Jika semua nilai di kolom = 0, normalisasi = 0.
+     * ⚠️ PENTING: Untuk COST criteria, jika ada nilai 0 (ideal):
+     * - Campaign dengan nilai 0 mendapat skor 1.0 (paling ideal)
+     * - minVal di-exclude nilai 0, hanya dari non-zero values
+     * - Ini memastikan campaign yang sudah penuhi target (sisa = 0) 
+     *   mendapat skor tertinggi untuk C4 (Sisa Kebutuhan Dana)
      */
     private function sawNormalize(array $matrix, int $n, int $m, array $criteriaTypes): array
     {
@@ -421,22 +425,35 @@ class SpkService
             $maxVal = max($column);
             $minVal = min($column);
 
+            // Untuk COST criteria dengan minVal = 0:
+            // Hitung minVal hanya dari nilai > 0 (exclude ideal values)
+            $minNonZero = null;
+            if ($criteriaTypes[$j] === self::COST && $minVal == 0) {
+                $nonZeroValues = array_filter($column, fn($v) => $v > 0);
+                $minNonZero = !empty($nonZeroValues) ? min($nonZeroValues) : 0;
+            }
+
             for ($i = 0; $i < $n; $i++) {
                 $xij = $matrix[$i][$j];
 
                 if ($criteriaTypes[$j] === self::BENEFIT) {
-                    // Semua kolom nol → 0
+                    // BENEFIT: rij = xij / max(xj)
                     $normalized[$i][$j] = $maxVal > 0
                         ? $xij / $maxVal
                         : 0;
                 } else {
-                    // COST: min / xij — hindari pembagian nol
+                    // COST: rij = min(non-zero) / xij
+                    // Logika: semakin kecil nilai semakin baik, 0 = ideal
                     if ($xij == 0) {
-                        $normalized[$i][$j] = 0;
+                        // Nilai 0 adalah ideal untuk cost → skor maksimal 1.0
+                        $normalized[$i][$j] = 1.0;
                     } elseif ($minVal == 0) {
-                        // min = 0 → semua pembilang 0
-                        $normalized[$i][$j] = 0;
+                        // Ada campaign dengan nilai ideal (0), gunakan minNonZero
+                        $normalized[$i][$j] = $minNonZero > 0 
+                            ? $minNonZero / $xij 
+                            : 0;
                     } else {
+                        // Case normal: semua nilai > 0
                         $normalized[$i][$j] = $minVal / $xij;
                     }
                 }
