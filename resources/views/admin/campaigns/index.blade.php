@@ -86,58 +86,6 @@
                         </td>
                     </tr>
 
-                    <!-- Edit Modal -->
-                    <div class="modal fade" id="editCampaignModal{{ $campaign->id }}" tabindex="-1" aria-labelledby="editCampaignModalLabel{{ $campaign->id }}" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <form action="{{ route('admin.campaigns.update', $campaign) }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                @method('PUT')
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editCampaignModalLabel{{ $campaign->id }}">Edit Kebutuhan</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Judul Kebutuhan</label>
-                                            <input type="text" class="form-control" name="title" value="{{ $campaign->title }}" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Target Dana (Rp)</label>
-                                            <input type="number" class="form-control" name="target_amount" value="{{ $campaign->target_amount }}" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Tenggat Waktu</label>
-                                            <input type="date" class="form-control" name="deadline" value="{{ $campaign->deadline }}">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Status</label>
-                                            <select name="status" class="form-select">
-                                                <option value="active" {{ $campaign->status == 'active' ? 'selected' : '' }}>Active</option>
-                                                <option value="completed" {{ $campaign->status == 'completed' ? 'selected' : '' }}>Completed</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Gambar Ilustrasi</label>
-                                            <input type="file" class="form-control" name="image" accept="image/*">
-                                            @if($campaign->image)
-                                                <div class="mt-2 text-muted small">Sudah ada gambar (upload baru untuk mengganti)</div>
-                                            @endif
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Deskripsi</label>
-                                            <textarea class="form-control" name="description" rows="3">{{ $campaign->description }}</textarea>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
                     @empty
                     <tr>
                         <td colspan="6" class="text-center py-4">Belum ada program kebutuhan panti.</td>
@@ -151,6 +99,59 @@
         </div>
     </div>
 </div>
+
+@foreach($campaigns as $campaign)
+<div class="modal fade" id="editCampaignModal{{ $campaign->id }}" tabindex="-1" aria-labelledby="editCampaignModalLabel{{ $campaign->id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('admin.campaigns.update', $campaign) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCampaignModalLabel{{ $campaign->id }}">Edit Kebutuhan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Judul Kebutuhan</label>
+                        <input type="text" class="form-control" name="title" value="{{ $campaign->title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Target Dana (Rp)</label>
+                        <input type="number" class="form-control" name="target_amount" value="{{ $campaign->target_amount }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tenggat Waktu</label>
+                        <input type="date" class="form-control" name="deadline" value="{{ $campaign->deadline }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="active" {{ $campaign->status == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="completed" {{ $campaign->status == 'completed' ? 'selected' : '' }}>Completed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gambar Ilustrasi</label>
+                        <input type="file" class="form-control" name="image" accept="image/*">
+                        @if($campaign->image)
+                            <div class="mt-2 text-muted small">Sudah ada gambar (upload baru untuk mengganti)</div>
+                        @endif
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Deskripsi</label>
+                        <textarea class="form-control" name="description" rows="3">{{ $campaign->description }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@endforeach
 
 <!-- Add Modal -->
 <div class="modal fade" id="addCampaignModal" tabindex="-1" aria-labelledby="addCampaignModalLabel" aria-hidden="true">

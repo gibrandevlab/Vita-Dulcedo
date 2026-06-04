@@ -12,6 +12,7 @@
             <div class="hidden md:flex md:items-center md:space-x-8">
                 <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600' : 'text-slate-600 hover:text-emerald-600 font-medium' }} px-1 py-2 transition-colors">Beranda</a>
                 <a href="{{ route('donasi') }}" class="{{ request()->routeIs('donasi') ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600' : 'text-slate-600 hover:text-emerald-600 font-medium' }} px-1 py-2 transition-colors">Donasi</a>
+                <a href="{{ route('spk.index') }}" class="{{ request()->routeIs('spk.index') ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600' : 'text-slate-600 hover:text-emerald-600 font-medium' }} px-1 py-2 transition-colors">Rekomendasi</a>
                 <a href="{{ route('kunjungan') }}" class="{{ request()->routeIs('kunjungan') ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600' : 'text-slate-600 hover:text-emerald-600 font-medium' }} px-1 py-2 transition-colors">Kunjungan</a>
                 <a href="{{ route('kegiatan') }}" class="{{ request()->routeIs('kegiatan') ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600' : 'text-slate-600 hover:text-emerald-600 font-medium' }} px-1 py-2 transition-colors">Kegiatan</a>
                 <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600' : 'text-slate-600 hover:text-emerald-600 font-medium' }} px-1 py-2 transition-colors">Tentang Kami</a>
@@ -123,6 +124,7 @@
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 shadow-lg bg-white">
             <a href="{{ route('home') }}" class="block px-3 py-2 rounded-md text-base font-semibold {{ request()->routeIs('home') ? 'text-emerald-700 bg-emerald-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">Beranda</a>
             <a href="{{ route('donasi') }}" class="block px-3 py-2 rounded-md text-base font-semibold {{ request()->routeIs('donasi') ? 'text-emerald-700 bg-emerald-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">Donasi</a>
+            <a href="{{ route('spk.index') }}" class="block px-3 py-2 rounded-md text-base font-semibold {{ request()->routeIs('spk.index') ? 'text-emerald-700 bg-emerald-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">Rekomendasi</a>
             <a href="{{ route('kunjungan') }}" class="block px-3 py-2 rounded-md text-base font-semibold {{ request()->routeIs('kunjungan') ? 'text-emerald-700 bg-emerald-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">Kunjungan</a>
             <a href="{{ route('kegiatan') }}" class="block px-3 py-2 rounded-md text-base font-semibold {{ request()->routeIs('kegiatan') ? 'text-emerald-700 bg-emerald-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">Kegiatan</a>
             <a href="{{ route('about') }}" class="block px-3 py-2 rounded-md text-base font-semibold {{ request()->routeIs('about') ? 'text-emerald-700 bg-emerald-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">Tentang Kami</a>

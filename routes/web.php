@@ -8,6 +8,8 @@ use App\Http\Controllers\AdminDonationController;
 use App\Http\Controllers\VisitRequestController;
 use App\Http\Controllers\AdminVisitRequestController;
 use App\Http\Controllers\AdminCampaignController;
+use App\Http\Controllers\AdminSpkController;
+use App\Http\Controllers\SpkController;
 
 // Public Pages
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -22,6 +24,9 @@ Route::controller(DonationController::class)->group(function () {
     Route::get('/donasi', 'index')->name('donasi');
     Route::post('/donasi', 'store')->name('donasi.store');
 });
+
+// SPK Rekomendasi Campaign (TOPSIS & SAW)
+Route::get('/rekomendasi-campaign', [SpkController::class, 'index'])->name('spk.index');
 
 // Kegiatan & Request Kunjungan
 Route::get('/kegiatan', [VisitRequestController::class, 'index'])->name('kegiatan');
@@ -74,5 +79,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/campaigns', 'store')->name('campaigns.store');
         Route::put('/campaigns/{campaign}', 'update')->name('campaigns.update');
         Route::delete('/campaigns/{campaign}', 'destroy')->name('campaigns.destroy');
+    });
+
+    Route::controller(AdminSpkController::class)->group(function () {
+        Route::get('/spk-pinning', 'index')->name('spk.pinning');
+        Route::post('/spk-pinning', 'update')->name('spk.pinning.update');
+        Route::post('/spk-pinning/hitung', 'hitung')->name('spk.pinning.hitung');
     });
 });

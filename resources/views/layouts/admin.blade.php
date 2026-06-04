@@ -61,6 +61,12 @@
                         <span class="menu-item-text">Kebutuhan Panti</span>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="{{ route('admin.spk.pinning') }}" class="{{ request()->routeIs('admin.spk.pinning') ? 'active' : '' }}">
+                        <i class="fa-solid fa-list-ol menu-item-icon"></i>
+                        <span class="menu-item-text">Slot Rekomendasi</span>
+                    </a>
+                </li>
             </ul>
 
             <div class="sidebar-user">

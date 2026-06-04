@@ -39,12 +39,92 @@ class DonationController extends Controller
         // Ambil data program kebutuhan yang aktif — pagination 10 per halaman
         $campaigns = \App\Models\Campaign::where('status', 'active')->latest()->paginate(10);
 
+        // Ambil top 15 recommended campaigns untuk masing-masing preset untuk mode smart
+        $allActiveCampaigns = \App\Models\Campaign::where('status', 'active')
+            ->where('target_amount', '>', 0)
+            ->with(['donations' => function ($query) {
+                $query->where('status', 'approved');
+            }])
+            ->get();
+
+        // Ambil data pinning per preset dari database
+        $allPins = \Illuminate\Support\Facades\DB::table('spk_pins')
+            ->join('campaigns', 'spk_pins.campaign_id', '=', 'campaigns.id')
+            ->where('campaigns.status', 'active')
+            ->select('spk_pins.preset', 'spk_pins.slot_number', 'spk_pins.campaign_id')
+            ->get();
+
+        $pinnedCampaignIds = $allPins->pluck('campaign_id')->unique()->toArray();
+        $pinnedCampaignsData = \App\Models\Campaign::whereIn('id', $pinnedCampaignIds)
+            ->with(['donations' => function ($query) {
+                $query->where('status', 'approved');
+            }])
+            ->get()
+            ->keyBy('id');
+
+        $pinnedCampaignsByPreset = [
+            'default'     => [],
+            'urgent'      => [],
+            'almost_done' => [],
+            'popular'     => [],
+        ];
+
+        foreach ($allPins as $pin) {
+            if (isset($pinnedCampaignsData[$pin->campaign_id])) {
+                $pinnedCampaignsByPreset[$pin->preset][$pin->slot_number] = $pinnedCampaignsData[$pin->campaign_id];
+            }
+        }
+
+        $smartData = [
+            'default'     => [],
+            'urgent'      => [],
+            'almost_done' => [],
+            'popular'     => [],
+        ];
+
+        if ($allActiveCampaigns->count() > 0) {
+            $spkService = new \App\Services\SpkService();
+
+            foreach (array_keys($smartData) as $presetKey) {
+                $pinnedCampaigns = $pinnedCampaignsByPreset[$presetKey] ?? [];
+                $pinnedIds = array_map(fn($c) => $c->id, $pinnedCampaigns);
+
+                $spkResult = $spkService->calculate($allActiveCampaigns, $presetKey);
+
+                // Filter ranking: hapus campaign yang sudah di-pin (hindari duplikat)
+                $filteredRanking = array_filter($spkResult['ranking'], function ($item) use ($pinnedIds) {
+                    return !in_array($item['campaign']->id, $pinnedIds);
+                });
+                $filteredRanking = array_values($filteredRanking);
+
+                // Build merged 15 slots: pinned campaigns get priority positions
+                $merged = [];
+                $autoIndex = 0;
+
+                for ($slot = 1; $slot <= 15; $slot++) {
+                    if (isset($pinnedCampaigns[$slot])) {
+                        // Slot ini dikunci oleh admin untuk preset ini
+                        $c = $pinnedCampaigns[$slot];
+                        $merged[] = $this->formatCampaignForSmart($c, $slot, true);
+                    } elseif (isset($filteredRanking[$autoIndex])) {
+                        // Isi otomatis dari ranking TOPSIS-SAW
+                        $c = $filteredRanking[$autoIndex]['campaign'];
+                        $merged[] = $this->formatCampaignForSmart($c, $slot, false);
+                        $autoIndex++;
+                    }
+                }
+
+                $smartData[$presetKey] = $merged;
+            }
+        }
+
         return view('donasi', [
             'totalDonasi'   => $totalDonasi,
             'riwayatHarian' => $riwayatHarian,
             'searchResult'  => $searchResult,
             'searchQuery'   => $searchQuery,
             'campaigns'     => $campaigns,
+            'smartData'     => $smartData,
         ]);
     }
 
@@ -114,4 +194,28 @@ class DonationController extends Controller
             'wa_url' => $waUrl
         ]);
     }
+
+    /**
+     * Format data campaign untuk mode smart.
+     */
+    private function formatCampaignForSmart($campaign, int $rank, bool $isPinned): array
+    {
+        $percentage = $campaign->target_amount > 0 
+            ? min(100, round(($campaign->collected_amount / $campaign->target_amount) * 100)) 
+            : 0;
+
+        return [
+            'id' => $campaign->id,
+            'title' => $campaign->title,
+            'description' => $campaign->description,
+            'image' => $campaign->image ? \Illuminate\Support\Facades\Storage::url($campaign->image) : null,
+            'target_amount' => (float) $campaign->target_amount,
+            'collected_amount' => (float) $campaign->collected_amount,
+            'percentage' => $percentage,
+            'deadline_human' => $campaign->deadline ? \Carbon\Carbon::parse($campaign->deadline)->diffForHumans() : null,
+            'rank' => $rank,
+            'is_pinned' => $isPinned,
+        ];
+    }
 }
+

@@ -132,24 +132,6 @@
                                     @endif
                                 </td>
                             </tr>
-
-                            <!-- Proof Modal -->
-                            <div class="modal fade" id="proofModal{{ $donation->id }}" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Pratinjau Bukti Transfer</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body text-center bg-light">
-                                            <img src="{{ asset('storage/' . $donation->bukti_transfer) }}" alt="Bukti Pembayaran" class="img-fluid rounded border shadow-sm" style="max-height: 500px; object-fit: contain;">
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             @empty
                             <tr>
                                 <td colspan="7" class="text-center py-4">
@@ -157,10 +139,29 @@
                                     <p class="text-muted fw-bold mb-0">Belum ada donasi untuk pencarian ini.</p>
                                 </td>
                             </tr>
-                            @endempty
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
+
+                @foreach($donations as $donation)
+                <div class="modal fade" id="proofModal{{ $donation->id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Pratinjau Bukti Transfer</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center bg-light">
+                                <img src="{{ asset('storage/' . $donation->bukti_transfer) }}" alt="Bukti Pembayaran" class="img-fluid rounded border shadow-sm" style="max-height: 500px; object-fit: contain;">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
 
                 {{-- Pagination --}}
                 @if($donations->hasPages())
